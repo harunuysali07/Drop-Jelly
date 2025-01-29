@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbcb72ddb39348f49984b04a17f6d36b, type: 3}
+  m_Name: Level Data_0
+  m_EditorClassIdentifier: 
+  _objectID: b3ef0fb9-d486-41f2-8604-427d5cbc20ee
+  isInfinityMoves: 1
+  totalMoves: 0
+  targetMatchCount: 20
+  targetColorData: {fileID: 0}
+  availableColors:
+  - {fileID: 11400000, guid: 897f529493120624a94d20813a1e5654, type: 2}
+  - {fileID: 11400000, guid: c7633ed1546cda84cb39c2216eaa245f, type: 2}
+  - {fileID: 11400000, guid: d3e2098330b3a8a458274496b975d1ea, type: 2}
+  - {fileID: 11400000, guid: b1bbbb8df1bf93c4a829841987c2dfa1, type: 2}
+  cubeColorsInGrid: []
+  cubeColorsToSpawn: []

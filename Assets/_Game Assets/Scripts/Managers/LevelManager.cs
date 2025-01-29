@@ -14,7 +14,7 @@ public class LevelManager : MonoBehaviour
     {
         if (FindObjectOfType<LevelController>())
         {
-            currentLevel = FindObjectOfType<LevelController>()?.Initialize();
+            currentLevel = FindObjectOfType<LevelController>()?.Initialize(DataManager.AllLevels[DataManager.CurrentLevelIndex % DataManager.AllLevels.Count]);
             
             Debug.LogWarning("Level Initialized From Scene !".LogColor(Color.yellow), this);
             return this;
@@ -28,7 +28,7 @@ public class LevelManager : MonoBehaviour
 
         var levelToInitialize = levels[DataManager.CurrentLevelIndex % levels.Count];
 
-        currentLevel = Instantiate(levelToInitialize).Initialize();
+        currentLevel = Instantiate(levelToInitialize).Initialize(DataManager.AllLevels[DataManager.CurrentLevelIndex % DataManager.AllLevels.Count]);
 
         return this;
     }

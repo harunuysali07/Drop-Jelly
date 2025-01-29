@@ -392,6 +392,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveAmountText: {fileID: 5100698821214073798}
   targetAmountText: {fileID: 2284181654339537833}
+  targetColorImage: {fileID: 6460623954923011225}
+  allColorsSprite: {fileID: 1922469736, guid: ce812a7bc7d811d49bbab56ec044a88d, type: 3}
 --- !u!1 &3016353834059882639
 GameObject:
   m_ObjectHideFlags: 0

@@ -143,19 +143,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bf261809af64754da6303401cb8afc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalMoves: 20
-  targetMatchCount: 30
-  availableColors:
-  - {fileID: 11400000, guid: 897f529493120624a94d20813a1e5654, type: 2}
-  - {fileID: 11400000, guid: c7633ed1546cda84cb39c2216eaa245f, type: 2}
-  - {fileID: 11400000, guid: d3e2098330b3a8a458274496b975d1ea, type: 2}
-  - {fileID: 11400000, guid: b1bbbb8df1bf93c4a829841987c2dfa1, type: 2}
-  - {fileID: 11400000, guid: 9ee6af57bad3d10489dea09f4aec57f0, type: 2}
-  - {fileID: 11400000, guid: 99e5aacc3e063f04e928d34d3d192605, type: 2}
-  - {fileID: 11400000, guid: ff061827f727f1544afd5ecff4be277f, type: 2}
-  targetColorData: {fileID: 0}
+  levelData: {fileID: 0}
   gridController: {fileID: 661488707404495728}
-  debugColors: []
 --- !u!1 &5609789510411302862
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // ReSharper disable InconsistentNaming
@@ -54,6 +56,10 @@ public static class DataManager
             OnCurrencyUpdated?.Invoke(value);
         } 
     }
+
+    private static List<LevelData> _allLevels;
+    
+    public static List<LevelData> AllLevels => _allLevels ??= Resources.LoadAll<LevelData>("Game Resources/Level Data").ToList();
 
     private struct PlayerPrefKeys
     {

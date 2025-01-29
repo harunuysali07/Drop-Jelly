@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -62,6 +61,17 @@ public class GridController : MonoBehaviour
 
                 if (y == 0)
                     cell.gameObject.SetActive(false);
+
+                var colorData  = _levelController.levelData.cubeColorsInGrid?.FirstOrDefault(c => c.position == cell.gridPosition);
+                if (colorData == null)
+                    continue;
+                
+                var  cube = Instantiate(cubePrefab, cubeSpawnPoint.position, Quaternion.identity);
+                cube.Initialize(colorData.colors.ToArray());
+                
+                cube.transform.position = cell.transform.position;
+                
+                cell.cube = cube;
             }
         }
 
@@ -76,6 +86,16 @@ public class GridController : MonoBehaviour
 
         if (_currentCube != null)
             return;
+
+        for (var i = 0; i < gridSize.x; i++)
+        {
+            if (_grid[i, 0].cube == null)
+                continue;
+            
+            GameManager.Instance.LevelFinish(false);
+                
+            return;
+        }
 
         _currentCube = Instantiate(cubePrefab, cubeSpawnPoint.position, Quaternion.identity);
         _currentCube.Initialize(_levelController.GetNextColors());
@@ -167,7 +187,7 @@ public class GridController : MonoBehaviour
 
                 var comparisonResult = targetCell.cube.CompareColors(neighbor.cube, comparisonType);
 
-                print($"{targetCell.name} - {neighbor.name} : {comparisonResult.Count} - {comparisonType}");
+                // print($"{targetCell.name} - {neighbor.name} : {comparisonResult.Count} - {comparisonType}");
             }
 
             if (targetCell != null && targetCell.cube != null)
