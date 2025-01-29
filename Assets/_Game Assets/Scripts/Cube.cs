@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class Cube : MonoBehaviour
 {
+    public bool IsReadyToMatch => gameObject.activeSelf && Time.time > _animationEndTime;
+    
     [SerializeField] private GameObject cubeObject;
 
     [Header("Transform References")]
@@ -22,6 +24,7 @@ public class Cube : MonoBehaviour
     [SerializeField] private Transform cube1X1BottomRight;
 
     private Transform _graphicsParent;
+    private float _animationEndTime;
 
     [Header("Debug Options")]
     [ShowInInspector] private ColorData[] _activeColors;
@@ -132,7 +135,8 @@ public class Cube : MonoBehaviour
     }
 
     //TODO: convert tuple to class or struct
-    private readonly List<Tuple<int, Cube, int>> _matchPairs = new();
+    [ShowInInspector, ReadOnly] private readonly List<Tuple<int, Cube, int>> _matchPairs = new();
+    [ShowInInspector, ReadOnly] private readonly List<Tuple<int, Cube, int>> _matchedPairs = new();
 
     public List<ColorData> CompareColors(Cube cube, CubeComparisonType comparisonType)
     {
@@ -216,10 +220,11 @@ public class Cube : MonoBehaviour
         {
             UpdateCubes(_matchPairs.Select(x => x.Item1).ToList());
 
-            var targetCubes = _matchPairs.Select(x => x.Item2).ToList();
-            targetCubes.ForEach(x => x.UpdateCubes(_matchPairs.Select(y => y.Item3).ToList()));
+            var targetCubes = _matchPairs.Select(x => x.Item2).Distinct().ToList();
+            targetCubes.ForEach(x => x.UpdateCubes(_matchPairs.Where(y => y.Item2 == x).Select(z => z.Item3).ToList()));
         }
 
+        _matchedPairs.AddRange(_matchPairs);
         _matchPairs.Clear();
     }
 
@@ -238,8 +243,13 @@ public class Cube : MonoBehaviour
                     _activeColors[i] = null;
                 }
             }
-            
-            Destroy(targetToDestroy);
+
+            if (targetToDestroy == null)
+                continue;
+
+            targetToDestroy.transform.DOScale(Vector3.zero, .2f)
+                .SetEase(Ease.InBack)
+                .OnComplete(() => Destroy(targetToDestroy));
             
             GameManager.Instance.levelManager.currentLevel.OnMatch(targetColor);
         }
@@ -248,7 +258,10 @@ public class Cube : MonoBehaviour
         {
             GameManager.Instance.levelManager.currentLevel.gridController.OnCubeDestroyed(this);
 
-            Destroy(gameObject);
+            transform.DOScale(Vector3.zero, .2f)
+                .SetEase(Ease.InBack)
+                .OnComplete(() => gameObject.SetActive(false));
+            // Destroy(gameObject);
 
             return;
         }
@@ -401,7 +414,7 @@ public class Cube : MonoBehaviour
             _activeColors[1] = _activeColors[3];
         }
 
-        this.Invoke(() => { GameManager.Instance.levelManager.currentLevel.gridController.OnCubeUpdated(this); }, .4f);
+        GameManager.Instance.levelManager.currentLevel.gridController.OnCubeUpdated(this);
     }
 
     private GameObject CreateCube(Transform targetTransform, Color color)
@@ -411,25 +424,34 @@ public class Cube : MonoBehaviour
         cube.transform.localRotation = targetTransform.localRotation;
 
         cube.transform.localScale = Vector3.zero;
-        cube.transform.DOScale(targetTransform.localScale, .2f).SetEase(Ease.OutBack);
+        cube.transform.DOScale(targetTransform.localScale, .25f).SetEase(Ease.OutBack);
 
         cube.gameObject.SetActive(true);
         cube.GetComponent<Renderer>().material.color = color;
 
         cube.name = targetTransform.name;
 
+        _animationEndTime = Time.time + .2f;
+        
         return cube;
     }
 
     private GameObject UpdateCube(GameObject cube, Transform targetTransform)
     {
         cube.transform.DOKill();
-        cube.transform.DOLocalMove(targetTransform.localPosition, .2f).SetEase(Ease.OutBack);
-        cube.transform.DOLocalRotateQuaternion(targetTransform.localRotation, .2f).SetEase(Ease.OutBack);
-        cube.transform.DOScale(targetTransform.localScale, .2f).SetEase(Ease.OutBack);
+        cube.transform.DOLocalMove(targetTransform.localPosition, .2f).SetEase(Ease.OutBack).SetDelay(.25f);
+        cube.transform.DOLocalRotateQuaternion(targetTransform.localRotation, .2f).SetEase(Ease.OutBack).SetDelay(.25f);
+        cube.transform.DOScale(targetTransform.localScale, .2f).SetEase(Ease.OutBack).SetDelay(.25f);
 
         cube.name = targetTransform.name;
 
+        _animationEndTime = Time.time + .5f;
+
         return cube;
+    }
+    
+    public void SetReadyToMatch(bool state)
+    {
+        _animationEndTime = state ? 0 : Time.time + 10f;
     }
 }

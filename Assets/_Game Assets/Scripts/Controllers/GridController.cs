@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -34,6 +35,8 @@ public class GridController : MonoBehaviour
         _levelController = GameManager.Instance.levelManager.currentLevel;
 
         CreateGrid();
+
+        StartCoroutine(CheckForMatchCoroutine());
     }
 
     private void CreateGrid()
@@ -64,8 +67,6 @@ public class GridController : MonoBehaviour
 
         _cubeMoveRange = new Vector2(_grid[0, 0].transform.position.x,
             _grid[gridSize.x - 1, gridSize.y - 1].transform.position.x);
-
-        SpawnBlock();
     }
 
     private void SpawnBlock()
@@ -85,7 +86,7 @@ public class GridController : MonoBehaviour
         if (_levelController.RemainingMoves <= 0)
             return;
 
-        if (_currentCube == null)
+        if (_currentCube == null || !_currentCube.IsReadyToMatch)
             return;
 
         var targetPosition = new Vector3(Mathf.Clamp(position.x, _cubeMoveRange.X, _cubeMoveRange.Y),
@@ -101,7 +102,7 @@ public class GridController : MonoBehaviour
         if (_levelController.RemainingMoves <= 0)
             return;
 
-        if (_currentCube == null)
+        if (_currentCube == null || !_currentCube.IsReadyToMatch)
             return;
 
         _levelController.OnMove();
@@ -114,31 +115,66 @@ public class GridController : MonoBehaviour
 
         _currentCube.transform.position = new Vector3(targetCell.transform.position.x, cubeSpawnPoint.position.y,
             cubeSpawnPoint.position.z);
+        
+        _currentCube.SetReadyToMatch(false);
         _currentCube.transform.DOMove(targetCell.transform.position, 10f).SetSpeedBased(true).SetEase(Ease.OutCubic)
-            .OnComplete(() => CheckForMatch(targetCell));
+            .OnComplete(() =>
+            {
+                targetCell.cube.SetReadyToMatch(true);
+                CheckForMatch(targetCell);
+            });
 
         targetCell.cube = _currentCube;
+        
         _currentCube.name = targetCell.name;
         _currentCube = null;
     }
 
     private void CheckForMatch(Cell targetCell)
     {
-        foreach (var comparisonType in (CubeComparisonType[])System.Enum.GetValues(typeof(CubeComparisonType)))
+        _matchQueue.Enqueue(targetCell);
+    }
+    
+    [ShowInInspector, ReadOnly] private readonly Queue<Cell> _matchQueue = new();
+
+    private IEnumerator CheckForMatchCoroutine()
+    {
+        var checkInterval = new WaitForSeconds(.25f);
+
+        while (enabled)
         {
-            var neighbor = GetNeighbor(targetCell, comparisonType);
-            if (neighbor == null || neighbor.cube == null)
+            yield return checkInterval;
+            
+            var targetCell = _matchQueue.Count > 0 ? _matchQueue.Dequeue() : null;
+
+            if (targetCell == null || targetCell.cube == null)
+            {
+                if (_matchQueue.Count == 0 && _cells.Where(x => x.cube != null).All(y => y.cube.IsReadyToMatch) && _currentCube == null)
+                {
+                    SpawnBlock();
+                }
+                
                 continue;
+            }
 
-            var comparisonResult = targetCell.cube.CompareColors(neighbor.cube, comparisonType);
+            yield return new WaitUntil(() => targetCell.cube == null || targetCell.cube.IsReadyToMatch);
+            
+            foreach (var comparisonType in (CubeComparisonType[])System.Enum.GetValues(typeof(CubeComparisonType)))
+            {
+                var neighbor = GetNeighbor(targetCell, comparisonType);
+                if (neighbor == null || neighbor.cube == null || targetCell == null || targetCell.cube == null)
+                    continue;
 
-            print($"{targetCell.name} - {neighbor.name} : {comparisonResult.Count} - {comparisonType}");
+                var comparisonResult = targetCell.cube.CompareColors(neighbor.cube, comparisonType);
+
+                print($"{targetCell.name} - {neighbor.name} : {comparisonResult.Count} - {comparisonType}");
+            }
+
+            if (targetCell != null && targetCell.cube != null)
+            {
+                targetCell.cube.ApplyMatch();
+            }
         }
-
-
-        targetCell.cube.ApplyMatch();
-
-        SpawnBlock();
     }
 
     private Cell GetNeighbor(Cell cell, CubeComparisonType comparisonType)
@@ -228,7 +264,7 @@ public class GridController : MonoBehaviour
         if (targetCell == null)
             yield break;
         
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(.3f);
 
         targetCell.cube = null;
 
@@ -241,8 +277,13 @@ public class GridController : MonoBehaviour
                 cell.cube.name = cell.name;
                 _grid[targetCell.gridPosition.x, i - 1].cube = null;
 
+                cell.cube.SetReadyToMatch(false);
                 cell.cube.transform.DOMove(cell.transform.position, 10f)
-                    .SetSpeedBased(true).SetEase(Ease.OutCubic).OnComplete(() => { CheckForMatch(cell); });
+                    .SetSpeedBased(true)
+                    .SetEase(Ease.OutCubic)
+                    .OnComplete(() => cell.cube.SetReadyToMatch(true));
+                
+                CheckForMatch(cell);
             }
         }
     }
