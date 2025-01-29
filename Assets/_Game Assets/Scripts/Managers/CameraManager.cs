@@ -17,7 +17,6 @@ public class CameraManager : MonoBehaviour
     private CinemachineVirtualCamera _activeVirtualCamera;
 
     private List<Transition> _transitions;
-    public bool IsPlayerTargeted => _activeVirtualCamera.m_Follow == PlayerController.Instance.transform;
 
     public CameraManager Initialize()
     {

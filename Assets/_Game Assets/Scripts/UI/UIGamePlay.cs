@@ -1,13 +1,20 @@
-using System;
-using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 
 public class UIGamePlay : MonoBehaviour
 {
-    [Required] public Joystick joystick;
-
-    private void OnValidate()
+    [SerializeField] private TextMeshProUGUI moveAmountText;
+    [SerializeField] private TextMeshProUGUI targetAmountText;
+    
+    public void UpdateMoveCount(int moveCount)
     {
-        joystick = GetComponentInChildren<Joystick>();
+        moveAmountText.text = moveCount.ToString();
     }
+    
+    public void UpdateTargetCount(int matchCount)
+    {
+        targetAmountText.text = matchCount.ToString();
+    }
+    
+    //∞ 180
 }

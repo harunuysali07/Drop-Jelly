@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
@@ -30,8 +31,9 @@ public static class MyExtensions
             action?.Invoke();
         }
     }
-    
-    public static Coroutine InvokeRepeating(this MonoBehaviour monoBehaviour, Action action, float time, float count = -1)
+
+    public static Coroutine InvokeRepeating(this MonoBehaviour monoBehaviour, Action action, float time,
+        float count = -1)
     {
         return monoBehaviour.StartCoroutine(InternalOperation());
 
@@ -40,7 +42,7 @@ public static class MyExtensions
             while (monoBehaviour.enabled)
             {
                 yield return new WaitForSeconds(time);
-                
+
                 action?.Invoke();
 
                 if (count-- == 0)
@@ -48,8 +50,9 @@ public static class MyExtensions
             }
         }
     }
-    
-    public static IEnumerator DoBlendShapeWeightCoroutine(this SkinnedMeshRenderer meshRenderer,int index , float target, float time)
+
+    public static IEnumerator DoBlendShapeWeightCoroutine(this SkinnedMeshRenderer meshRenderer, int index,
+        float target, float time)
     {
         float currentTime = 0;
         var startValue = meshRenderer.GetBlendShapeWeight(index);
@@ -63,8 +66,9 @@ public static class MyExtensions
             yield return null;
         }
     }
-    
-    public static void DoLayersWeight(this MonoBehaviour monoBehaviour, Animator animator, float targetWeight, float time)
+
+    public static void DoLayersWeight(this MonoBehaviour monoBehaviour, Animator animator, float targetWeight,
+        float time)
     {
         monoBehaviour.StartCoroutine(SetLayersWeightInTime(animator, targetWeight, time));
     }
@@ -82,7 +86,7 @@ public static class MyExtensions
             yield return null;
         }
     }
-    
+
     public static Vector3 SamplePosition(this Vector3 position)
     {
         if (NavMesh.SamplePosition(position, out var hit, 2.0f, NavMesh.AllAreas))
@@ -101,7 +105,7 @@ public static class MyExtensions
     {
         return Random.Range(vector2Int.x, vector2Int.y);
     }
-    
+
     public static Transform SampleTransformPosition(this Transform transform)
     {
         if (NavMesh.SamplePosition(transform.position, out var hit, 2.0f, NavMesh.AllAreas))
@@ -115,7 +119,7 @@ public static class MyExtensions
 
         return transform;
     }
-    
+
     public static void Log(this Debug debug, string message, Color color)
     {
         Debug.Log("<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + message + "</color>");

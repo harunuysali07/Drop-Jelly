@@ -34,7 +34,7 @@ MonoBehaviour:
   defaultAutoKill: 1
   defaultLoopType: 0
   debugMode: 1
-  debugStoreTargetId: 0
+  debugStoreTargetId: 1
   showPreviewPanel: 1
   storeSettingsLocation: 1
   modules:

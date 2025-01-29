@@ -74,7 +74,6 @@ public class GameManager : MonoSingleton<GameManager>
     {
         if (GameState != GameState.Gameplay)
         {
-            Debug.LogError("Game State is not Gameplay", this);
             return;
         }
 
